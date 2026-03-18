@@ -766,11 +766,15 @@ def order_results(
             continue
 
         # Ignore results with artists match lower than 70%
-        if artists_match < 70 and result.source != "slider.kz":
+        # SoundCloud uses uploader usernames which rarely match Spotify
+        # artist names, so we use a relaxed threshold (same as slider.kz)
+        artist_threshold = 70 if result.source not in ("slider.kz", "soundcloud") else 0
+        if artists_match < artist_threshold:
             debug(
                 song.song_id,
                 result.result_id,
-                "Skipping result due to artists match lower than 70%",
+                "Skipping result due to artists match lower than %s%%",
+                artist_threshold,
             )
             continue
 
